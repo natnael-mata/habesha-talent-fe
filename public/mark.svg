@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- The mark is the misregistration itself: two plates pulled out of
+       alignment inside one screen frame. Legible at 16px, no letterform,
+       so it needs no webfont. -->
+  <rect width="64" height="64" fill="#e4e4e0"/>
+  <rect x="8" y="8" width="38" height="38" fill="#f7961d"/>
+  <rect x="18" y="18" width="38" height="38" fill="#ff2d7a"/>
+  <rect x="13" y="13" width="38" height="38" fill="none" stroke="#141412" stroke-width="6"/>
+</svg>

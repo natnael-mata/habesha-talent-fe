@@ -1,0 +1,928 @@
+/* ሀበሻ ታለንት — the press.
+   Every device in this file is named in DESIGN.md § Signature devices:
+   the pull, registration marks, the halftone screen, the drying rack,
+   the squeegee. Nothing here fades, blurs or rounds. */
+
+/* ══ Shell ══════════════════════════════════════════════════════════════ */
+
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding-inline: var(--pad);
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--pink);
+  color: var(--ink);
+  padding: 12px 18px;
+  border: var(--rule-w) solid var(--rule);
+  font-weight: 700;
+}
+.skip:focus {
+  left: 8px;
+  top: 8px;
+}
+
+/* ══ The halftone screen ════════════════════════════════════════════════
+   A real dot screen at 3px pitch, multiplied over ink fields so it reads as
+   a printed tint at arm's length rather than as texture. Never a blur. */
+
+.screen {
+  position: relative;
+}
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 0, 0, 0.42) 0.8px,
+    rgba(0, 0, 0, 0) 1.05px
+  );
+  background-size: var(--dot) var(--dot);
+  mix-blend-mode: multiply;
+}
+
+/* ══ The pull ═══════════════════════════════════════════════════════════
+   Misregistration as a solid displaced copy. On type it is a layered
+   text-shadow at ZERO blur; on frames it is a displaced plate. */
+
+.pull {
+  position: relative;
+  text-shadow:
+    0.09em 0.08em 0 var(--pink),
+    -0.05em -0.045em 0 var(--marigold);
+}
+
+/* The letterforms carry the screen.
+   This is the single most identifying move in the source world — its display
+   type is *made of* halftone dots, not merely sitting near screened images.
+   The glyph and its two offset plates stay exactly as they are; a clipped
+   pseudo-element lays the dot screen over the black plate only.
+   It has to be a pseudo-element rather than `background-clip: text` on the
+   element itself: text-shadow paints ABOVE an element's own background, so
+   clipping the screen to the element would put the pink and marigold plates
+   on top of the dots instead of behind them.
+   Requires `data-text` mirroring the heading — see the JSX. Headings without
+   it simply render solid, which is a correct fallback rather than a break. */
+.pull[data-text]::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  color: transparent;
+  text-shadow: none;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle at 50% 50%,
+    rgba(240, 240, 236, 0.72) 0.85px,
+    rgba(0, 0, 0, 0) 1.15px
+  );
+  background-size: var(--dot) var(--dot);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.pull--pink {
+  text-shadow: 0.05em 0.045em 0 var(--pink);
+}
+.pull--marigold {
+  text-shadow: 0.05em 0.045em 0 var(--marigold);
+}
+.pull--ink {
+  text-shadow: 0.045em 0.04em 0 var(--ink);
+}
+
+/* A frame that sits on a displaced plate. The parent must establish
+   isolation so the -1 layer cannot escape behind the page. */
+.plated {
+  position: relative;
+}
+.plated::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--pink);
+  transform: translate(var(--pull-x), var(--pull-y));
+}
+.plated--marigold::before {
+  background: var(--marigold);
+}
+.isolate {
+  isolation: isolate;
+}
+
+/* ══ Registration marks ═════════════════════════════════════════════════ */
+
+.regframe {
+  position: relative;
+}
+.regmark {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--pink-ink) 0 0) center / 100% 1.5px no-repeat,
+    linear-gradient(var(--pink-ink) 0 0) center / 1.5px 100% no-repeat;
+}
+.regmark--tl {
+  top: -8px;
+  left: -8px;
+}
+.regmark--tr {
+  top: -8px;
+  right: -8px;
+}
+.regmark--bl {
+  bottom: -8px;
+  left: -8px;
+}
+.regmark--br {
+  bottom: -8px;
+  right: -8px;
+}
+
+/* ══ Type ═══════════════════════════════════════════════════════════════ */
+
+.display {
+  font-family: var(--face-display);
+  font-weight: 900;
+  line-height: var(--lh-display);
+  margin: 0;
+  overflow-wrap: break-word;
+}
+.d-xxl {
+  font-size: clamp(40px, 8.4vw, 104px);
+}
+.d-xl {
+  font-size: clamp(32px, 5.4vw, 62px);
+}
+.d-l {
+  font-size: clamp(26px, 3.4vw, 40px);
+}
+.d-m {
+  font-size: clamp(21px, 2.4vw, 29px);
+}
+
+/* Margin annotation — the hand note beside a rack. Latin/digits only get
+   tracking; the Amharic in these labels must not, so tracking is applied
+   only to the .code variant which never contains Ethiopic. */
+.note {
+  font-size: var(--t-micro);
+  font-weight: 700;
+  color: var(--ink-3);
+  line-height: 1.5;
+  margin: 0;
+}
+/* .code is for Latin and digits ONLY — it tracks, and tracking is forbidden
+   on Ethiopic (DESIGN.md § Type). Any small label containing Amharic uses
+   .label instead, which carries a pink tick in place of the tracking. */
+.code {
+  font-family: 'Archivo', sans-serif;
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+}
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--t-micro);
+  font-weight: 800;
+  letter-spacing: 0;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.label::before {
+  content: '';
+  flex: none;
+  width: 11px;
+  height: 3px;
+  background: var(--pink-ink);
+}
+.label--bare::before {
+  display: none;
+}
+.figure {
+  font-family: var(--face-display);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.lead {
+  font-size: clamp(17px, 1.5vw, 20px);
+  line-height: 1.6;
+  color: var(--ink-2);
+  margin: 0;
+  max-width: 46ch;
+}
+
+/* ══ Buttons ════════════════════════════════════════════════════════════
+   Pink field, black ink (5.2:1). Edge ticks straddle the frame — the
+   world's mark for "this is pressable". Press collapses the plate: the
+   print lands. */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 13px 30px;
+  border: var(--rule-w) solid var(--rule);
+  background: var(--pink);
+  color: var(--ink);
+  font-family: var(--face-text);
+  font-size: 17px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--press),
+    box-shadow var(--press),
+    background var(--press);
+  box-shadow: var(--pull-x) var(--pull-y) 0 0 var(--ink);
+}
+.btn::before,
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 17px;
+  height: 17px;
+  transform: translateY(-50%);
+  background:
+    linear-gradient(var(--ink) 0 0) center / 100% 2px no-repeat,
+    linear-gradient(var(--ink) 0 0) center / 2px 100% no-repeat;
+}
+.btn::before {
+  left: -9px;
+}
+.btn::after {
+  right: -9px;
+}
+.btn:hover {
+  background: var(--pink-deep);
+}
+.btn:active {
+  transform: translate(var(--pull-x), var(--pull-y));
+  box-shadow: 0 0 0 0 var(--ink);
+}
+.btn[disabled] {
+  background: var(--foil-deep);
+  color: var(--ink-3);
+  cursor: not-allowed;
+  box-shadow: var(--pull-x) var(--pull-y) 0 0 var(--foil-lo);
+}
+.btn[disabled]::before,
+.btn[disabled]::after {
+  background:
+    linear-gradient(var(--foil-lo) 0 0) center / 100% 2px no-repeat,
+    linear-gradient(var(--foil-lo) 0 0) center / 2px 100% no-repeat;
+}
+.btn--marigold {
+  background: var(--marigold);
+}
+.btn--marigold:hover {
+  background: #e08512;
+}
+.btn--ghost {
+  background: transparent;
+  box-shadow: none;
+}
+.btn--ghost:hover {
+  background: var(--foil-hi);
+}
+.btn--ghost:active {
+  transform: none;
+}
+.btn--block {
+  width: 100%;
+}
+.btn--sm {
+  min-height: 44px;
+  padding: 9px 20px;
+  font-size: 15px;
+}
+
+/* A plain text action — underlined in pink-ink, never a coloured word on
+   its own (pink at full strength fails contrast as a letter). */
+.link {
+  display: inline-block;
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+  border-bottom: 3px solid var(--pink);
+  padding-bottom: 1px;
+}
+.link:hover {
+  background: var(--pink);
+}
+
+/* ══ Fields ═════════════════════════════════════════════════════════════ */
+
+.field {
+  display: block;
+  margin-bottom: 22px;
+}
+.field__label {
+  display: block;
+  font-size: var(--t-small);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.field__input {
+  display: block;
+  width: 100%;
+  min-height: 54px;
+  padding: 13px 15px;
+  background: var(--foil-hi);
+  border: var(--rule-w) solid var(--rule);
+  font-size: 17px;
+  font-weight: 600;
+  transition:
+    border-color var(--press),
+    box-shadow var(--press);
+}
+.field__input::placeholder {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.field__input:focus {
+  outline: none;
+  border-color: var(--marigold-ink);
+  box-shadow: 4px 4px 0 0 var(--marigold);
+}
+.field__input[aria-invalid='true'] {
+  border-color: var(--pink-ink);
+  box-shadow: 4px 4px 0 0 var(--pink);
+}
+.field__hint {
+  display: block;
+  margin-top: 7px;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.field__err {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 8px;
+  font-size: var(--t-small);
+  font-weight: 700;
+  color: var(--pink-ink);
+}
+.field__err::before {
+  content: '';
+  flex: none;
+  width: 13px;
+  height: 13px;
+  margin-top: 5px;
+  background:
+    linear-gradient(var(--pink-ink) 0 0) center / 100% 2px no-repeat,
+    linear-gradient(var(--pink-ink) 0 0) center / 2px 100% no-repeat;
+  transform: rotate(45deg);
+}
+
+/* A whole-form failure — a pink plate, black ink. */
+/* Pulled in the OTHER screen, deliberately.
+   Pink is already the primary button's field, and an error plate in pink sits
+   in the same panel at the same width — in testing the two read as one object
+   and "this failed" was indistinguishable from "press this". Marigold carries
+   black at 8.2:1 and is the only other field this system has. See DESIGN.md
+   § Ink states, where error is now a listed state rather than a third,
+   undeclared meaning for pink. */
+.notice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  border: var(--rule-w) solid var(--rule);
+  background: var(--marigold);
+  color: var(--ink);
+  font-size: var(--t-small);
+  font-weight: 700;
+  box-shadow: 4px 4px 0 0 var(--ink);
+}
+
+/* ══ Masthead and nav ═══════════════════════════════════════════════════ */
+
+.masthead {
+  border-bottom: var(--rule-w) solid var(--rule);
+  background: var(--foil-hi);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.masthead__in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 70px;
+  padding-block: 10px;
+}
+.nav {
+  display: flex;
+  border: var(--rule-w) solid var(--rule);
+}
+.nav__cell {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 8px 17px;
+  font-size: var(--t-small);
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--foil-hi);
+  border-right: var(--rule-w) solid var(--rule);
+}
+.nav__cell:last-child {
+  border-right: 0;
+}
+.nav__cell:hover {
+  background: var(--foil-deep);
+}
+.nav__cell[aria-current='page'] {
+  background: var(--pink);
+}
+
+/* ══ The drying rack ════════════════════════════════════════════════════
+   Equal frames on a shared baseline, bounded by a pink registration rule
+   with corner marks and an annotated margin. */
+
+.rack {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: var(--gap);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--foil-hi);
+  border: var(--rule-w) solid var(--rule);
+  text-decoration: none;
+  color: var(--ink);
+  transition:
+    transform var(--press),
+    box-shadow var(--press);
+  box-shadow: 0 0 0 0 var(--ink);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--pink);
+  transform: translate(0, 0);
+  transition: transform var(--press);
+}
+.card--new::before {
+  transform: translate(var(--pull-x), var(--pull-y));
+}
+.card--seen::before {
+  background: var(--foil-lo);
+}
+.card:hover::before,
+.card:focus-visible::before {
+  background: var(--marigold);
+  transform: translate(var(--pull-x), var(--pull-y));
+}
+.card__frame {
+  position: relative;
+  border-bottom: var(--rule-w) solid var(--rule);
+  background: var(--foil-deep);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+.card__frame svg {
+  width: 100%;
+  height: 100%;
+}
+.card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px 16px 16px;
+  flex: 1;
+}
+.card__title {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 0;
+  /* Ethiopic clamps badly mid-glyph-cluster; two full lines, then ellipsis. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1.5px solid var(--foil-lo);
+}
+.metum {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.metum__k {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-3);
+  line-height: 1.3;
+}
+.metum__v {
+  font-size: var(--t-small);
+  font-weight: 800;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Edition stamp — the view count set as an edition size in the frame
+   corner, the one place the source world and the product metric agree. */
+.stamp {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 10px 4px;
+  background: var(--foil-hi);
+  border-top: var(--rule-w) solid var(--rule);
+  border-left: var(--rule-w) solid var(--rule);
+}
+.stamp__n {
+  font-family: var(--face-display);
+  font-size: 21px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.stamp__l {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+/* State flag — colour is never alone; each flag carries its Amharic word. */
+.flag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 5px 11px 4px;
+  font-size: var(--t-micro);
+  font-weight: 800;
+  color: var(--ink);
+  background: var(--pink);
+  border-right: var(--rule-w) solid var(--rule);
+  border-bottom: var(--rule-w) solid var(--rule);
+}
+.flag--marigold {
+  background: var(--marigold);
+}
+
+/* ══ The press bed ══════════════════════════════════════════════════════
+   Black, framed, and empty until a play is requested. Nothing preloads. */
+
+.bed {
+  position: relative;
+  background: var(--bed);
+  border: var(--rule-w) solid var(--rule);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+.bed video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--bed);
+}
+/* The edition sheet behind an unplayed video: one face, ten pulls. */
+.bed__sheet {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 2px;
+  background: var(--ink);
+}
+.bed__pull {
+  position: relative;
+  overflow: hidden;
+}
+.bed__pull svg {
+  width: 100%;
+  height: 100%;
+}
+.bed__play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  border: 0;
+  /* No scrim. A wash over the edition turns fluro pink into maroon and
+     marigold into brown, which destroys the one thing the sheet is showing.
+     The play control earns its contrast from its own hard-edged plate. */
+  background: transparent;
+  cursor: pointer;
+  color: var(--foil-hi);
+}
+.bed__play:hover {
+  background: rgba(247, 150, 29, 0.16);
+}
+.bed__playmark {
+  display: grid;
+  place-items: center;
+  width: 116px;
+  height: 116px;
+  background: var(--pink);
+  border: 3px solid var(--ink);
+  box-shadow:
+    var(--pull-x) var(--pull-y) 0 0 var(--marigold),
+    calc(var(--pull-x) + 3px) calc(var(--pull-y) + 3px) 0 0 var(--ink);
+  transition: transform var(--press);
+}
+.bed__play:hover .bed__playmark {
+  transform: translate(2px, 2px);
+}
+.bed__playlabel {
+  padding: 6px 14px;
+  background: var(--foil-hi);
+  border: var(--rule-w) solid var(--ink);
+  color: var(--ink);
+  font-size: var(--t-small);
+  font-weight: 800;
+}
+
+/* ══ Panels ═════════════════════════════════════════════════════════════ */
+
+.panel {
+  background: var(--foil-hi);
+  border: var(--rule-w) solid var(--rule);
+  padding: clamp(20px, 3vw, 34px);
+}
+.panel--sunken {
+  background: var(--foil-deep);
+}
+.panel--bed {
+  background: var(--bed);
+  color: var(--foil);
+}
+
+.hr {
+  height: var(--rule-w);
+  background: var(--rule);
+  border: 0;
+  margin: 0;
+}
+.hr--pink {
+  height: 1.5px;
+  background: var(--pink-ink);
+}
+
+/* ══ Dropzone ═══════════════════════════════════════════════════════════ */
+
+/* An un-inked frame, not the universal dashed rectangle.
+   `border: 2px dashed` is the one component here that could sit unchanged in
+   any generic app. The world already has the right idiom three rules down in
+   `.ghost`: a frame whose screen has not been pulled yet. Waiting for a file
+   IS that state. */
+.drop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  padding: 40px 22px;
+  text-align: center;
+  background: var(--foil-deep);
+  border: var(--rule-w) solid var(--rule);
+  cursor: pointer;
+  transition: background var(--press);
+}
+.drop:hover,
+.drop--over {
+  background: var(--marigold);
+}
+.drop--filled {
+  background: var(--foil-hi);
+  place-items: stretch;
+  text-align: start;
+  padding: 18px;
+}
+
+/* The progress bar is a squeegee: a hard-edged bar of ink crossing the
+   screen, not a rounded meter. */
+.squeegee {
+  position: relative;
+  height: 26px;
+  background: var(--foil-deep);
+  border: var(--rule-w) solid var(--rule);
+  overflow: hidden;
+}
+/* One carriage carries both the laid ink and the blade at its leading edge,
+   so the whole stroke is a single composited translate. Animating `width`
+   and `left` (the obvious way to build a meter) thrashes layout on every
+   frame — and the target device is the cheap Android in the use scene, not
+   the laptop this was built on. */
+.squeegee__carriage {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  left: -100%;
+  width: 100%;
+  background: var(--pink);
+  transition: transform 160ms linear;
+  will-change: transform;
+}
+.squeegee__carriage::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  background: var(--ink);
+}
+.squeegee__pct {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--face-display);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  mix-blend-mode: multiply;
+}
+
+/* ══ The squeegee wipe ══════════════════════════════════════════════════
+   The one orchestrated motion. Content is VISIBLE BY DEFAULT — the wipe
+   only ever runs forward from a hidden start on elements that opt in, and
+   reduced-motion resolves it instantly. A failed animation can never hide
+   a video. */
+
+/* Built as a transition out of @starting-style rather than a delayed
+   animation with a `backwards` fill. The difference matters: a delayed
+   animation holds its hidden first frame during the delay, so anything that
+   stops animations from running — a stalled frame, a capture harness, an
+   engine without support — leaves the content invisible. Here the resting
+   state IS the visible one, and the wipe is what the browser transitions
+   *from*. Nothing can hide a video by failing. */
+
+.wipe {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path var(--wipe);
+  transition-delay: var(--wipe-delay, 0ms);
+}
+
+@starting-style {
+  .wipe {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wipe {
+    transition: none;
+    clip-path: none;
+  }
+  .card,
+  .card::before,
+  .btn {
+    transition: none;
+  }
+}
+
+/* ══ Utilities ══════════════════════════════════════════════════════════ */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+.row {
+  display: flex;
+  align-items: center;
+}
+.wrap {
+  flex-wrap: wrap;
+}
+.gap-6 {
+  gap: 6px;
+}
+.gap-10 {
+  gap: 10px;
+}
+.gap-14 {
+  gap: 14px;
+}
+.gap-20 {
+  gap: 20px;
+}
+.gap-30 {
+  gap: 30px;
+}
+.mt-auto {
+  margin-top: auto;
+}
+.grow {
+  flex: 1;
+}
+.center {
+  justify-content: center;
+}
+.between {
+  justify-content: space-between;
+}
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ══ Responsive ═════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  :root {
+    --pad: 16px;
+    --gap: 16px;
+    --pull-x: 4px;
+    --pull-y: 4px;
+  }
+  .rack {
+    grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .rack {
+    grid-template-columns: 1fr;
+  }
+  .masthead__in {
+    flex-wrap: wrap;
+    min-height: 0;
+    gap: 10px;
+  }
+  .nav {
+    flex: 1;
+  }
+  .nav__cell {
+    flex: 1;
+    justify-content: center;
+    padding-inline: 8px;
+  }
+  .btn {
+    width: 100%;
+  }
+  /* A small action stays small — full-width would make logout look like the
+     page's primary act. */
+  .btn--sm {
+    width: auto;
+  }
+  /* Ten pulls at 360px would be ten smudges. */
+  .bed__sheet {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .bed__pull:nth-child(n + 7) {
+    display: none;
+  }
+  .bed__playmark {
+    width: 88px;
+    height: 88px;
+  }
+}

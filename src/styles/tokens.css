@@ -1,0 +1,187 @@
+/* ሀበሻ ታለንት — tokens, faces and ground.
+   Values are the contract recorded in DESIGN.md. Change them there first. */
+
+/* ── Faces ────────────────────────────────────────────────────────────────
+   Self-hosted. No CDN: the pitch runs on a meeting-room connection that may
+   not exist. Latin faces are listed FIRST in every stack so digits and codes
+   set in Anton/Archivo while Amharic falls through to Noto Sans Ethiopic —
+   the fallback chain is doing deliberate typographic work here, not
+   error-handling. font-synthesis is off so Anton is never faux-bolded. */
+
+@font-face {
+  font-family: 'Noto Sans Ethiopic';
+  src: url('/fonts/noto-ethiopic-var.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+1200-137F, U+1380-139F, U+2D80-2DDF, U+AB00-AB2F;
+}
+@font-face {
+  font-family: 'Anton';
+  src: url('/fonts/anton.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Archivo';
+  src: url('/fonts/archivo-var.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  /* ── Ink and foil ─────────────────────────────────────────────────── */
+  --foil: #e4e4e0;
+  --foil-hi: #f7f7f5;
+  --foil-lo: #b6b6b1;
+  --foil-deep: #cdcdc8;
+
+  --ink: #141412;
+  --ink-2: #46443e;
+  --ink-3: #6a675e;
+
+  --pink: #ff2d7a;
+  --pink-deep: #e31063;
+  --pink-ink: #c4004e; /* the only pink allowed to be a letter on foil */
+
+  --marigold: #f7961d;
+  --marigold-ink: #8a5000; /* the only marigold allowed to be a letter */
+
+  --bed: #0c0c0b;
+  --rule: #141412;
+
+  /* ── Structure ────────────────────────────────────────────────────── */
+  --rule-w: 2px;
+  --pull-x: 5px; /* misregistration of the pink plate */
+  --pull-y: 5px;
+  --dot: 3px; /* halftone screen pitch */
+
+  --gap: 20px;
+  --pad: 22px;
+  --shell: 1320px;
+
+  /* ── Type ─────────────────────────────────────────────────────────── */
+  --face-display: 'Anton', 'Noto Sans Ethiopic', system-ui, sans-serif;
+  --face-text: 'Archivo', 'Noto Sans Ethiopic', system-ui, sans-serif;
+
+  /* Ethiopic sets larger and looser than Latin at the same nominal size. */
+  --t-body: 17px;
+  --t-small: 15px;
+  --t-micro: 12px;
+  --lh-body: 1.65;
+  --lh-display: 1.08;
+
+  /* ── Motion ───────────────────────────────────────────────────────── */
+  --wipe: 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  --press: 90ms cubic-bezier(0.3, 0.8, 0.3, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-radius: 0; /* DESIGN.md: no radius anywhere, no exceptions */
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--face-text);
+  font-size: var(--t-body);
+  font-weight: 500;
+  line-height: var(--lh-body);
+  font-synthesis-weight: none;
+  background-color: var(--foil);
+
+  /* The foil.
+     Striations alone read as brushed aluminium or linen — a regular pinstripe,
+     not a crumpled sheet. What makes foil look like foil is large-scale
+     luminance blotching (300–600px) with hard creases across it, and only then
+     the fine grain. So: a fractal-noise tile carries the crumple, two hard
+     diagonal creases cut across it, and the striations sit on top as the
+     finest layer rather than as the whole material. No soft glow anywhere.
+     Fixed attachment so the sheet stays still while content moves over it. */
+  background-image:
+    repeating-linear-gradient(96deg, rgba(255, 255, 255, 0.42) 0 1px, rgba(255, 255, 255, 0) 1px 7px),
+    repeating-linear-gradient(93deg, rgba(0, 0, 0, 0.04) 0 1px, rgba(0, 0, 0, 0) 1px 13px),
+    linear-gradient(
+      74deg,
+      rgba(255, 255, 255, 0) 39.5%,
+      rgba(255, 255, 255, 0.2) 39.8%,
+      rgba(0, 0, 0, 0.018) 40.1%,
+      rgba(255, 255, 255, 0) 40.4%
+    ),
+    linear-gradient(
+      -68deg,
+      rgba(255, 255, 255, 0) 61.6%,
+      rgba(0, 0, 0, 0.02) 61.9%,
+      rgba(255, 255, 255, 0.18) 62.2%,
+      rgba(255, 255, 255, 0) 62.5%
+    ),
+    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='620' height='620'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0055' numOctaves='5' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='620' height='620' filter='url(%23c)' opacity='0.62'/%3E%3C/svg%3E"),
+    linear-gradient(
+      112deg,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0) 16%,
+      rgba(0, 0, 0, 0.05) 32%,
+      rgba(255, 255, 255, 0) 45%,
+      rgba(255, 255, 255, 0.46) 59%,
+      rgba(255, 255, 255, 0) 72%,
+      rgba(0, 0, 0, 0.05) 87%,
+      rgba(255, 255, 255, 0.34) 100%
+    );
+  background-size:
+    auto, auto, auto, auto, 620px 620px, auto;
+  background-attachment: fixed;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--ink);
+}
+
+/* One focus treatment across the product: a marigold plate, offset, hard. */
+:focus-visible {
+  outline: 3px solid var(--marigold-ink);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--pink);
+  color: var(--ink);
+}
+
+/* Ethiopic never takes tracking or case. Enforced globally so a later
+   component cannot quietly reintroduce it. */
+[lang='am'],
+body {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
