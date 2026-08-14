@@ -226,8 +226,9 @@ function openSession(sub: Subscriber & { password_hash?: string }): Session {
   return session
 }
 
-/** GET /api/auth/me — reads the stored session. */
-export function currentSession(): Session | null {
+/** GET /api/auth/me — async to match the real client, so AuthContext does not
+ *  need to know which implementation it is talking to. */
+export async function currentSession(): Promise<Session | null> {
   const raw = sessionStorage.getItem(SESSION_KEY)
   if (!raw) return null
   try {
@@ -238,7 +239,7 @@ export function currentSession(): Session | null {
 }
 
 /** POST /api/auth/logout */
-export function logout() {
+export async function logout(): Promise<void> {
   sessionStorage.removeItem(SESSION_KEY)
 }
 

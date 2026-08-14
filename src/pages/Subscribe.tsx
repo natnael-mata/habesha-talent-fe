@@ -25,8 +25,8 @@ const STEPS: { k: string; b: string; n: string; cat: Category }[] = [
 ]
 
 export default function Subscribe() {
-  const { subscriber } = useAuth()
-  if (subscriber) return <Navigate to="/videos" replace />
+  const { status } = useAuth()
+  if (status === 'authed') return <Navigate to="/videos" replace />
 
   return (
     <main id="main" className="shell auth">

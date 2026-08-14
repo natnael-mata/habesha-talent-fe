@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import * as api from '../api/mock'
+import * as api from '../api'
 import { ApiError, ERROR_KEY } from '../api/types'
 import { useAuth } from '../auth/AuthContext'
 import Field, { validate } from '../components/Field'

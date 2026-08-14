@@ -29,8 +29,7 @@ export default function Masthead() {
               type="button"
               className="btn btn--ghost btn--sm"
               onClick={() => {
-                logout()
-                navigate('/')
+                void logout().then(() => navigate('/'))
               }}
             >
               {t('logout')}

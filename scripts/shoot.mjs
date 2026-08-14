@@ -86,16 +86,24 @@ try {
   const goto = async (path, { auth = false, wait = 1400 } = {}) => {
     await send('Page.navigate', { url: `${BASE}/` })
     await sleep(500)
-    /* Always clear first — a session left over from a previous shot would
-       bounce the login capture straight to the feed. */
-    await send('Runtime.evaluate', { expression: 'sessionStorage.clear()' })
+    /* Always sign out first — a session left over from a previous shot would
+       bounce the login capture straight to the feed. The session is an
+       httpOnly cookie, so it is dropped through the API, not from storage. */
+    await send('Runtime.evaluate', {
+      expression: `fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'}).then(r=>r.status)`,
+      awaitPromise: true,
+    })
+    await sleep(300)
     if (auth) {
+      /* Sign in the way a subscriber does. Nothing in src/ knows this script
+         exists, and there is no auth bypass in the product. */
       await send('Runtime.evaluate', {
-        expression: `sessionStorage.setItem('habesha-talent/session/v1', JSON.stringify({
-          token: 'demo.1.shoot',
-          subscriber: { id: 1, phone_number: '0911223344', display_name: 'ሰላም ተ.', status: 'active', created_on: '${new Date(Date.now() - 96 * 864e5).toISOString()}' }
-        }))`,
+        expression: `fetch('/api/auth/login',{method:'POST',credentials:'same-origin',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({phone_number:'0911223344',password:'talent123'})}).then(r=>r.status)`,
+        awaitPromise: true,
       })
+      await sleep(400)
     }
     await send('Page.navigate', { url: `${BASE}${path}` })
     await sleep(wait)

@@ -16,14 +16,18 @@ npm run verify
 | Layer | Result |
 |---|---|
 | Front-end unit + integration (`npm test`) | **14/14** |
-| Front-end browser acceptance (`npm run verify`, real Chrome over CDP) | **17/17** |
-| Phone normalisation (`npm run test:phone   # in the habesha-talent-be repo`) | **6/6** |
-| Provisioning endpoint against a real MySQL | **all passed** (Layer 2c) |
+| Front-end browser acceptance (`npm run verify`, real Chrome over CDP) | **17/17 — against the real API + MySQL** |
+| Phone normalisation (`npm run test:phone`, habesha-talent-be) | **6/6** |
+| API against a real MySQL | **all passed** (Layer 3) |
+| VAS provisioning against a real MySQL | **all passed** (Layer 2c) |
 | Design detector | clean |
 
-What is and is not automated is stated honestly below. The remaining gap is the
-rest of the REST API — login, feed, upload, view counting — which still lives in
-the front end's mock.
+The API is built and wired: the front end runs against it by default, and the
+browser suite exercises the whole chain — React → Vite proxy → Express → MySQL.
+`VITE_USE_MOCK=true` swaps in the offline implementation for the pitch, verified
+separately to make zero network requests.
+
+What is and is not automated is stated honestly below.
 
 ---
 
@@ -123,31 +127,44 @@ log in with the credential they were last SMSed, and the rows cannot be
 reconciled against the operator. The normalisation in `src/phone.js` is what
 makes the `UNIQUE` index actually mean one line, one account.
 
-## Layer 3 — API automation (specified, not yet written)
+## Layer 3 — The API against a real MySQL (verified)
 
-Blocked on the real backend: there is no server to drive, and asserting against
-`src/api/mock.ts` would only test the stub. When Express + MySQL land, these are
-the cases, and the mock already implements each behaviour so the UI states exist:
+The back end is built, and every route below was exercised against a live
+MariaDB with a scoped user — the same shape AletCloud provisions. **All passed.**
 
-| Case | Expected | Task |
-|---|---|---|
-| `POST /auth/register` with a fresh number | 201, `created_on` equals insert time, `password_hash` is bcrypt | T11 |
-| `POST /auth/register` with an existing number | 409 `phone_taken`; **the same rejection for `09…` and `+2519…` spellings** | T11 |
-| `POST /auth/register` password < 6 | 422 `password_short` | T11 |
-| `POST /auth/login` wrong password | 401 `invalid_login` | T11 |
-| `POST /auth/login` unknown number | 401 `invalid_login` — **byte-identical to the wrong-password response**, so the endpoint cannot enumerate subscribers | T11 |
-| 5 failed logins on one number | 429 `rate_limited`, 60s lockout | T11 |
-| `GET /videos` | approved only, newest first, correct `has_more` | T14 |
-| `POST /videos/:id/view` | count increments by exactly 1; a client-supplied count is ignored | T15 |
-| `POST /videos` 101MB file | 413 `file_size` | T16 |
-| `POST /videos` `.mov` file | 415 `file_type` | T16 |
-| Any authed route without a token | 401 | T17 |
-| **DB inspection** | `SELECT password_hash FROM subscribers` returns no plaintext | PLAN § 9 |
+| Case | Result |
+|---|---|
+| `GET /api/videos` with no session | `401` |
+| `POST /api/auth/login` wrong password | `401 invalid_login` |
+| `POST /api/auth/login` unknown number | `401` — **byte-identical**, so it cannot enumerate subscribers |
+| `POST /api/auth/login` correct | `200`, session cookie set |
+| …the same account spelled `+2519…` | `200` — normalisation holds on the login path too |
+| Session cookie is `HttpOnly` | ✓ — script cannot read it |
+| `GET /api/auth/me` | `200` |
+| `GET /api/videos/:id` | correct row, creator phone masked |
+| `POST /api/videos/:id/view` twice | `1174 → 1175 → 1176`, persisted |
+| `GET /api/videos/999` | `404` |
+| `POST /api/videos` (mp4) | `201`, appears first in the feed |
+| The uploaded file streams | `200` |
+| …with `Range: bytes=0-1023` | **`206`** — seeking works |
+| `POST /api/videos` with a `.txt` | `415 file_type` |
+| `POST /api/videos` with an empty title | `422 title_required` |
+| `POST /api/videos` with no session | `401` |
+| 7 rapid bad logins (limit 5) | `401 ×5`, then **`429 rate_limited` ×2** |
+| `POST /api/vas/register` alongside the app API | `201` — still works |
+
+**The VAS callback, separately** (see also Layer 2c): new number `201`, retry
+`200` with the same id, the same line posted as `+2519…` `200` with that same
+id — **7 rows after three deliveries, not 8** — bcrypt rotated on
+re-provisioning, `created_on` preserved.
 
 ## Layer 4 — UI end-to-end (automated)
 
 `npm run verify` (`scripts/verify.mjs`) drives real Chrome over CDP against the
-running dev server. **14/14 passing.**
+running dev server, which proxies to the real API and MySQL. **17/17 passing.**
+
+The proof it is genuinely end to end: pressing play in the browser moved
+`videos.view_count` for row 3 from 1181 to 1182 in the database.
 
 | # | Check | Task |
 |---|---|---|
@@ -158,8 +175,11 @@ running dev server. **14/14 passing.**
 | 5 | Correct login lands on the video list | T12 |
 | 6 | The list renders a rack of cards | T14 |
 | 7 | Every card shows title, posted date, views **and** creator — asserted per card, not on the first one | T14 |
-| 8 | Duplicate phone rejected in Amharic — **entered as `+2519…` against an account created as `09…`** | T13 |
-| 9 | Signing back in works | T12 |
+| 8 | The subscribe page carries no account-creating form | T36 |
+| 9 | It shows the SMS keyword and shortcode | T36 |
+| 10 | The unconfirmed shortcode is visibly marked | T40 |
+| 11 | The old `/register` URL redirects to `/subscribe` | T36 |
+| 12 | Signing back in works | T12 |
 | 10 | Playing a video increments the view count | T15 |
 | 11 | The incremented count survives a reload | T15 |
 | 12 | The HTML5 player actually loads the demo clip (`readyState 4`, no media error) | T15, T21 |
@@ -211,10 +231,11 @@ resting state is the visible one) and the over-zoomed player poster.
 
 ## Known gaps
 
-1. **The four manual flows above.** Upload needs a real `File` pushed into the
-   picker; reduced-motion, 360px and keyboard-only were checked by hand and by
-   screenshot but are not scripted.
-2. **No backend, so no API layer.** `src/api/mock.ts` is the seam.
+1. **Browser-driven upload.** The API upload path is covered in Layer 3 by a
+   real multipart request; pushing a `File` into the picker from CDP is not
+   scripted. Reduced-motion, 360px and keyboard-only were checked by hand and
+   by screenshot but are not scripted either.
+2. **Amharic wording is unreviewed** — see below.
 3. **Amharic wording is unreviewed.** Authored, not written by a native speaker
    — flagged as F1 in TASK.md. The tests prove the strings are *Amharic*; they
    cannot prove they are *good* Amharic.

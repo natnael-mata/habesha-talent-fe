@@ -44,11 +44,15 @@ import './styles/press.css'
 import './styles/pages.css'
 
 function Shell() {
-  const { subscriber } = useAuth()
+  const { status } = useAuth()
   const { pathname } = useLocation()
   /* The entry pages carry their own lockup; the masthead belongs to the
      signed-in product. */
-  const chrome = subscriber && pathname !== '/' && pathname !== '/subscribe' && pathname !== '/register'
+  const chrome =
+    status === 'authed' &&
+    pathname !== '/' &&
+    pathname !== '/subscribe' &&
+    pathname !== '/register'
 
   return (
     <>

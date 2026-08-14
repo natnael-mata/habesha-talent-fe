@@ -17,9 +17,12 @@ with Ethio Telecom.
 > the subscriber would not be subscribed, not be billed, and could not be
 > reconciled. `/subscribe` is an instructions page, not a form.
 
-> **All data here is mocked.** Every video, creator name and view count on
-> screen is authored demo content, marked as such in the interface. See
-> [TASK.md](TASK.md) § Flagged for what still needs a real asset or a decision.
+> **Two data modes.** By default the app talks to the real API at `/api`
+> (`habesha-talent-be`). `npm run dev:mock` switches to an in-memory mock with
+> no server, no database and no network at all — that is what the Ethio Telecom
+> pitch runs on, so a meeting room with a dead connection cannot break the demo.
+> Either way the demo content is authored and marked as such in the interface;
+> see [TASK.md](TASK.md) § Flagged for what still needs a real asset.
 
 | Document | What it owns |
 |---|---|
@@ -34,11 +37,23 @@ this is where the product and design work happens.
 
 ## Run it
 
+Against the real API — start `habesha-talent-be` first (see its README), then:
+
 ```bash
 npm install && npm run dev
 ```
 
-Then open <http://localhost:5180>. The login page is the entry point.
+Open <http://localhost:5180>. Vite proxies `/api` and `/media` to the back end
+on :8091, so the browser sees a single origin exactly as it will in production —
+no CORS, no base URL, and cookies behave the same in both environments.
+
+Or with no back end at all, for the pitch:
+
+```bash
+npm run dev:mock
+```
+
+The login page is the entry point either way.
 
 **Demo sign-in** (also shown on the login screen behind a demo marker):
 
@@ -66,8 +81,13 @@ npm run verify
 npm run demo:media
 ```
 
+```bash
+npm run build:mock
+```
+
 `verify` drives real Chrome over CDP against the running dev server and checks
-every PLAN.md § 9 acceptance criterion a browser can prove. `demo:media`
+every PLAN.md § 9 acceptance criterion a browser can prove — it needs the back
+end running, because it exercises the real API. `demo:media`
 regenerates the five demo clips in `public/demo/` — it renders each slate in
 headless Chrome (which has the Ethiopic fonts) and encodes with `ffmpeg-static`
 to baseline H.264, the profile that plays on the mid-range Androids this product
@@ -89,7 +109,9 @@ locales/am.json          every visible string — no hard-coded text in componen
 src/config.ts            SMS keyword + shortcode, behind a `confirmed` flag
 src/i18n.ts              t(), Amharic number + date formatting
 src/api/types.ts         the data model, matching PLAN.md § 6
-src/api/mock.ts          THE SEAM — mock REST, swap for the real backend here
+src/api/index.ts         THE SEAM — picks http or mock; pages import from here
+src/api/http.ts          the real client, same-origin /api
+src/api/mock.ts          in-memory implementation for the offline pitch
 src/api/demoData.ts      authored demo content
 src/auth/AuthContext.tsx session + the route guard (no register — by design)
 src/components/          Mark, Field, VideoCard, PerformerPrint, PressFoot…
@@ -102,14 +124,18 @@ scripts/shoot.mjs        design capture rig (CDP, desktop + mobile)
 scripts/verify.mjs       browser acceptance checks
 ```
 
-## Wiring it to the real API
+## How the app reaches the API
 
-`src/api/mock.ts` is the only file that knows where data comes from. Each
-exported function documents the endpoint it stands in for:
+`src/api/index.ts` is the seam. It exports one set of names and picks the
+implementation behind them, so no page, component or hook knows which it got:
+
+| | |
+|---|---|
+| `src/api/http.ts` | the real client — same-origin `/api`, session in an httpOnly cookie |
+| `src/api/mock.ts` | in-memory, zero network, for the pitch (`VITE_USE_MOCK=true`) |
 
 | Function | Endpoint |
 |---|---|
-| `provisionSubscriber` | `POST /api/vas/register` — **built, in `habesha-talent-be`** |
 | `login` | `POST /api/auth/login` |
 | `currentSession` / `logout` | `GET /api/auth/me` · `POST /api/auth/logout` |
 | `listVideos` | `GET /api/videos?page=&page_size=` |
@@ -118,15 +144,16 @@ exported function documents the endpoint it stands in for:
 | `listBySubscriber` | `GET /api/subscribers/:id/videos` |
 | `uploadVideo` | `POST /api/videos` (multipart) |
 
-Replace the bodies with `fetch` calls and keep the signatures. Two things the
-mock already enforces that the server must keep:
+Subscriber creation is absent by design — `POST /api/vas/register` is the
+operator's callback and is never reached from the browser.
+
+Three properties both implementations hold, and any replacement must keep:
 
 1. **The view increment is server-side.** The client asks; the server decides.
 2. **Login failures are indistinguishable** between "no such number" and "wrong
-   password", so the error cannot be used to enumerate registered subscribers.
-
-`provisionSubscriber` is documented here for reference only — the front end
-never calls it, and never should.
+   password", so the error cannot enumerate registered subscribers.
+3. **Upload progress comes from XHR, not fetch** — fetch still cannot report it,
+   and on a metered mobile connection that bar is not decoration.
 
 ## Deploying
 

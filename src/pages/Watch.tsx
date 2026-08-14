@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import * as api from '../api/mock'
+import * as api from '../api'
 import type { VideoWithCreator } from '../api/types'
 import { markSeen } from '../seen'
 import PerformerPrint from '../components/PerformerPrint'

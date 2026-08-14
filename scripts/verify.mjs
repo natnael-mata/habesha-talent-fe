@@ -92,7 +92,8 @@ try {
 
   // ── 1. The login page is the entry point ─────────────────────────────
   await goto('/')
-  await evaluate('sessionStorage.clear()')
+  await evaluate(`fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'}).then(r=>r.status)`)
+  await sleep(400)
   await goto('/')
   check(
     'Opening the site shows the login page with logo and promo content',
@@ -147,7 +148,13 @@ try {
   )
 
   // ── 5. The subscribe page is instructions, NOT a signup form ─────────
-  await evaluate(`sessionStorage.removeItem('habesha-talent/session/v1'), true`)
+  // Sign out through the API: the session is an httpOnly cookie, so clearing
+  // storage does nothing, and /subscribe redirects an authenticated visitor
+  // straight to the feed.
+  await evaluate(
+    `fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'}).then(r=>r.status)`,
+  )
+  await sleep(400)
   await goto('/subscribe')
   check(
     'The subscribe page carries no account-creating form',

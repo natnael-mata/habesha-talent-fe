@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import * as api from '../api/mock'
+import * as api from '../api'
 import type { VideoWithCreator } from '../api/types'
 import { useAuth } from '../auth/AuthContext'
 import { seenIds } from '../seen'

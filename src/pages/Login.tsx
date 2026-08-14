@@ -34,7 +34,7 @@ const STEPS = [
 ] as const
 
 export default function Login() {
-  const { subscriber, login } = useAuth()
+  const { status, login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -44,7 +44,7 @@ export default function Login() {
   const [formError, setFormError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  if (subscriber) return <Navigate to="/videos" replace />
+  if (status === 'authed') return <Navigate to="/videos" replace />
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()

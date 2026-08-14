@@ -13,7 +13,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "verify": "node scripts/verify.mjs",
-    "shoot": "node scripts/shoot.mjs"
+    "shoot": "node scripts/shoot.mjs",
+    "dev:mock": "VITE_USE_MOCK=true vite",
+    "build:mock": "VITE_USE_MOCK=true vite build"
   },
   "author": "B AND M Software Development & Entertainment PLC",
   "license": "UNLICENSED",
