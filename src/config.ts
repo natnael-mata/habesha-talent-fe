@@ -1,16 +1,21 @@
-/* Values Ethio Telecom must confirm before this goes near a subscriber.
+/* Subscription facts, confirmed with Bereket on 2026-08-17.
  *
- * These are the commercial facts the build is not allowed to invent
- * (PRODUCT.md § Evidence on Hand). They ship as visibly-marked placeholders:
- * while `confirmed` is false, every screen that shows them also shows that
- * they are unconfirmed. Flip the flag only once ET has signed them off — the
- * warning disappears on its own.
+ * The flow, end to end:
+ *   1. The customer texts OK to 6431.
+ *   2. Ethio Telecom's 900 system passes the number to OneVAS, the aggregator.
+ *   3. OneVAS sends the customer an SMS carrying this site's link and a
+ *      password, and POSTs the same `phone_number` and `password` to our
+ *      provisioning endpoint, which inserts the subscriber row.
+ *   4. The customer opens the link and signs in with those two values.
+ *
+ * So the app never creates an account and never issues a password — it only
+ * ever verifies one that already exists. See PRODUCT.md § Operating Context.
  */
 export const VAS = {
-  /** TODO(ET): the real SMS keyword a subscriber texts. */
-  keyword: 'TALENT',
-  /** TODO(ET): the real shortcode it is sent to. */
-  shortcode: '8XXX',
-  /** TODO(ET): set true once both values above are confirmed. */
-  confirmed: false,
+  /** The SMS keyword the customer sends. */
+  keyword: 'OK',
+  /** The shortcode they send it to. */
+  shortcode: '6431',
+  /** Both values confirmed — the page no longer shows an unconfirmed marker. */
+  confirmed: true,
 } as const

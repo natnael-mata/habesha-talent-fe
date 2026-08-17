@@ -21,6 +21,10 @@ const ALLOWED_LATIN = [
   'MP4', // file format, written the same way in Amharic copy
   'WebM', // file format
   'XXXXXXXX', // the 09XXXXXXXX input mask
+  /* The SMS keyword the customer types. It is a literal a subscriber must
+     send verbatim to 6431 — transliterating it into Ethiopic would produce a
+     message the operator's shortcode does not recognise. */
+  'OK',
 ]
 
 /* The SMS keyword and shortcode are configuration, not copy — they live in

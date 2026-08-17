@@ -2,14 +2,12 @@
   "app_name": "ሀበሻ ታለንት",
   "app_owner": "ቢ ኤንድ ኤም ሶፍትዌር ልማትና መዝናኛ",
   "partner_note": "ከኢትዮ ቴሌኮም ጋር በመተባበር",
-
   "login": "ግባ",
   "register": "ተመዝገብ",
   "logout": "ውጣ",
   "phone_number": "ስልክ ቁጥር",
   "password": "የይለፍ ቃል",
   "confirm_password": "የይለፍ ቃል ያረጋግጡ",
-
   "videos": "ቪዲዮዎች",
   "title": "ርዕስ",
   "posted_date": "የተለጠፈበት ቀን",
@@ -19,11 +17,10 @@
   "welcome_promo": "ተሰጥኦዎን ለዓለም ያሳዩ!",
   "invalid_login": "ስልክ ቁጥር ወይም የይለፍ ቃል ትክክል አይደለም",
   "required_field": "ይህ መስክ አስፈላጊ ነው",
-
   "promo_lead": "ስልክ ቁጥርዎ ብቻ ይበቃል።",
   "promo_body": "ዘፈን፣ ዳንስ፣ ኮሜዲ፣ ግጥም — የሚችሉትን ይቅረጹ፣ ይላኩት፣ ኢትዮጵያ ትይዎት።",
   "promo_step_1_k": "ተመዝገቡ",
-  "promo_step_1_b": "በአጭር መልእክት ብቻ። ካርድ አያስፈልግም፣ ኢሜይል አያስፈልግም።",
+  "promo_step_1_b": "OK ብለው ወደ 6431 ይላኩ። ካርድ አያስፈልግም፣ ኢሜይል አያስፈልግም።",
   "promo_step_2_k": "ስቀሉ",
   "promo_step_2_b": "የቀረጹትን ቪዲዮ ከርዕስ ጋር ይላኩ። አንድ ደቂቃ ይበቃል።",
   "promo_step_3_k": "ይታዩ",
@@ -32,14 +29,12 @@
   "rack_pull_hint": "ጎትተው አዲስ ኅትመት ይሳቡ",
   "rack_editions": "{n} ኅትመቶች",
   "rack_screens": "{n} ስክሪኖች",
-
   "have_account": "አካውንት አለዎት?",
   "no_account": "አካውንት የለዎትም?",
   "create_account": "አዲስ አካውንት ይክፈቱ",
   "back_to_login": "ወደ መግቢያ ተመለስ",
   "signing_in": "እየገባ ነው…",
   "registering": "እየተመዘገበ ነው…",
-
   "subscribe": "እንዴት ይመዝገባሉ",
   "subscribe_title": "በአጭር መልእክት ይመዝገቡ",
   "subscribe_lead": "ምዝገባ የሚከናወነው በኢትዮ ቴሌኮም መስመርዎ ላይ ነው። በዚህ ገጽ ላይ አካውንት አይከፈትም።",
@@ -47,17 +42,16 @@
   "subscribe_sms_to": "ወደ",
   "subscribe_step_1_k": "መልእክት ይላኩ",
   "subscribe_step_1_b": "ከኢትዮ ቴሌኮም ቁጥርዎ አጭር መልእክት ይላኩ። ምዝገባው በመስመርዎ ላይ ይከናወናል።",
-  "subscribe_step_2_k": "የይለፍ ቃል ይደርስዎታል",
-  "subscribe_step_2_b": "ኢትዮ ቴሌኮም አካውንትዎን ከፍቶ የይለፍ ቃልዎን በአጭር መልእክት ይልክልዎታል።",
+  "subscribe_step_2_k": "አገናኝና የይለፍ ቃል ይደርስዎታል",
+  "subscribe_step_2_b": "የገጹ አገናኝና የይለፍ ቃልዎ በአጭር መልእክት ይላክልዎታል። የይለፍ ቃሉን ያስቀምጡ።",
   "subscribe_step_3_k": "ይግቡ",
-  "subscribe_step_3_b": "በስልክ ቁጥርዎና በደረሰዎት የይለፍ ቃል ወደዚህ ገጽ ገብተው ቪዲዮ ይመልከቱ፤ ይለጥፉ።",
+  "subscribe_step_3_b": "በስልክ ቁጥርዎና በደረሰዎት የይለፍ ቃል ገብተው ቪዲዮ ይመልከቱ፤ ይለጥፉ።",
   "subscribe_shortcode_todo": "የአጭር መልእክት ቁጥሩና ቃሉ ከኢትዮ ቴሌኮም ጋር ገና አልተረጋገጡም",
   "subscribe_not_here": "በዚህ ገጽ ላይ አካውንት መክፈት አይቻልም",
   "go_to_login": "ወደ መግቢያ ይሂዱ",
   "phone_placeholder": "09XXXXXXXX",
   "phone_hint": "የኢትዮ ቴሌኮም ቁጥርዎን ያስገቡ",
   "password_hint": "ቢያንስ 6 ፊደላት",
-
   "err_phone_format": "ትክክለኛ የኢትዮጵያ ስልክ ቁጥር ያስገቡ — 09XXXXXXXX ወይም +2519XXXXXXXX",
   "err_password_short": "የይለፍ ቃል ቢያንስ 6 ፊደላት መሆን አለበት",
   "err_password_match": "የይለፍ ቃላቱ አይመሳሰሉም",
@@ -67,11 +61,9 @@
   "err_rate_limited": "ብዙ ሙከራ ተደርጓል። ከአንድ ደቂቃ በኋላ ይሞክሩ።",
   "err_generic": "ስህተት ተከስቷል",
   "retry": "እንደገና ሞክር",
-
   "nav_feed": "ቪዲዮዎች",
   "nav_upload": "ስቀል",
   "nav_account": "አካውንት",
-
   "feed_kicker": "የዛሬው መድረክ",
   "feed_count_label": "ቪዲዮዎች",
   "load_more": "ተጨማሪ ጫን",
@@ -80,7 +72,6 @@
   "empty_title": "ገና ምንም ቪዲዮ የለም",
   "empty_body": "መድረኩ ባዶ ነው። የመጀመሪያው ተወዳዳሪ ይሁኑ።",
   "empty_cta": "የመጀመሪያውን ቪዲዮ ስቀል",
-
   "state_new": "አዲስ",
   "state_playing": "በመታየት ላይ",
   "play": "አጫውት",
@@ -90,7 +81,6 @@
   "more_from_stage": "ሌሎች ከመድረኩ",
   "not_found_title": "ቪዲዮው አልተገኘም",
   "not_found_body": "የፈለጉት ቪዲዮ የለም ወይም ተነስቷል።",
-
   "upload_kicker": "አዲስ ኅትመት",
   "upload_lead": "ተሰጥኦዎን ይላኩ",
   "upload_title_label": "የቪዲዮው ርዕስ",
@@ -115,26 +105,22 @@
   "upload_preview": "ቅድመ እይታ",
   "upload_preview_note": "ቪዲዮዎ በዝርዝሩ ላይ እንዲህ ሆኖ ይታያል",
   "upload_untitled": "ርዕስ የለም",
-
   "account_title": "አካውንትዎ",
   "account_since": "የተመዘገቡበት ቀን",
   "account_uploads": "የለጠፉት",
   "account_total_views": "አጠቃላይ እይታ",
   "confirm_logout": "መውጣት ይፈልጋሉ?",
   "cancel": "ተወው",
-
   "cat_song": "ዘፈን",
   "cat_dance": "ዳንስ",
   "cat_comedy": "ኮሜዲ",
   "cat_poetry": "ግጥም",
   "cat_instrument": "መሣሪያ",
-
   "today": "ዛሬ",
   "yesterday": "ትናንት",
   "days_ago": "ከ{n} ቀን በፊት",
   "weeks_ago": "ከ{n} ሳምንት በፊት",
   "months_ago": "ከ{n} ወር በፊት",
-
   "demo_badge": "የሙከራ መረጃ",
   "demo_note": "በዚህ ገጽ ላይ ያሉት ቪዲዮዎች፣ ስሞችና ቁጥሮች ለማሳያ የተዘጋጁ ናቸው።",
   "skip_to_content": "ወደ ዋናው ክፍል ዝለል"

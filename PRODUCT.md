@@ -56,17 +56,28 @@ is small on purpose: an Ethiopian stage, in Ethiopian script, one phone number a
   unreliable connection. Uploads will fail partway and must be recoverable.
 - **Registration happens entirely outside the app, and this is the single most
   important fact about the product's shape.** Confirmed by the user on
-  2026-08-13:
-  1. The subscriber subscribes by **SMS to a shortcode**, on their own line.
-  2. Ethio Telecom's **VAS/SDP provisions them** and issues a password.
-  3. The VAS system **`POST`s the phone number and password to our endpoint**.
-  4. We insert that into the `subscribers` table. That row *is* the account.
-  5. The subscriber then simply **logs in** with credentials they already have.
+  2026-08-17, with the exact keyword and shortcode:
+  1. The customer texts **`OK`** to **`6431`**.
+  2. Ethio Telecom's 900 system passes the number to **OneVAS**, the
+     aggregator sitting between the operator and us.
+  3. OneVAS sends the customer an **SMS carrying this site's link and a
+     password**, and simultaneously **`POST`s the same `phone_number` and
+     `password`** to our provisioning endpoint.
+  4. We insert the row. That row *is* the account.
+  5. The customer opens the link and signs in with those two values.
 
-  There is **no in-app signup form**, and there must never be one: an account
-  the app created itself would not exist on the operator's side, so the
-  subscriber would not be subscribed, would not be billed, and could not be
-  reconciled. The app reads the account; it never creates one.
+  So the app never creates an account and never issues a password — it only
+  ever verifies one that already exists. There is **no in-app signup form**,
+  and there must never be one: an account the app created itself would not
+  exist on the operator's side, so the subscriber would not be subscribed,
+  would not be billed, and could not be reconciled.
+
+  Two consequences worth holding on to:
+  - **The deployed URL is SMSed to real customers.** Changing the host means
+    every previously-sent link breaks, so settle the domain before launch.
+  - **The password is chosen by OneVAS, not by us and not by the subscriber.**
+    We cannot enforce a strength policy on it without locking out people who
+    are already being billed.
 - The phone number is the username. Ethiopian mobile numbers are `09XXXXXXXX`
   or `+2519XXXXXXXX`, and the two spellings must normalise to one account.
 - The evaluation ritual for this build is a live tap-through in a meeting room, on a
